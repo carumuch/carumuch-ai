@@ -16,6 +16,7 @@ from U_Model import Unet
 import cv2
 import io
 import base64
+from flask_cors import CORS
 
 #Tensorflow 관련
 from tensorflow.keras.preprocessing import image
@@ -29,7 +30,7 @@ import torch
 
 
 app = Flask(__name__)
-
+CORS(app)
 # app 실행 시 VGG16 모델 로드 (지연 로드 방식 참고해볼것(추후))
 base_model = VGG16(weights='imagenet')
 v_model = Model(inputs=base_model.input, outputs=base_model.get_layer('fc1').output)
