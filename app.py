@@ -30,7 +30,7 @@ import torch
 
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
 # app 실행 시 VGG16 모델 로드 (지연 로드 방식 참고해볼것(추후))
 base_model = VGG16(weights='imagenet')
 v_model = Model(inputs=base_model.input, outputs=base_model.get_layer('fc1').output)
@@ -235,11 +235,11 @@ def classify():
     
     if manufacturer == 'kia':
         img_features = process_image(image_url)
-        pickle_filename = 'D:/Desktop/캡스톤_차량파손/차량파손이미지데이터/data/kia_features_dict.pkl'
+        pickle_filename = './kia_features_dict.pkl'
         with open(pickle_filename, 'rb') as f:
             loaded_df = pickle.load(f)
         most_similar_image, highest_similarity = npath_compare_images(img_features, loaded_df)
-        k_cost_file_path = 'D:/Desktop/캡스톤_차량파손/차량파손이미지데이터/data/kia_견적서'
+        k_cost_file_path = './kia_견적서'
         list_repair, total_cost = close_cost(k_cost_file_path, most_similar_image, manufacturer)
         del(loaded_df)
 
@@ -275,14 +275,14 @@ def classify():
     elif manufacturer == 'hyundai':
     # 이미지 처리 함수 적용 (특징 추출)
         img_features = process_image(image_url)
-        pickle_filename = 'D:/Desktop/캡스톤_차량파손/차량파손이미지데이터/data/h_features_dict.pkl'
+        pickle_filename = './h_features_dict.pkl'
         
         # 견적서 데이터 로드 및 유사도 비교
         with open(pickle_filename, 'rb') as f:
             loaded_df = pickle.load(f)
         most_similar_image, highest_similarity = npath_compare_images(img_features, loaded_df)
         print(most_similar_image)
-        h_cost_file_path = 'D:/Desktop/캡스톤_차량파손/차량파손이미지데이터/data/hyundai_견적서'
+        h_cost_file_path = './hyundai_견적서'
         list_repair, total_cost = close_cost(h_cost_file_path, most_similar_image, manufacturer)
         del(loaded_df)
 
@@ -312,8 +312,13 @@ def classify():
             print(f"이미지 인코딩 오류: {e}")
             return jsonify({"error": "이미지 인코딩에 실패했습니다."}), 500
 
-
-
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    return response
 if __name__ == '__main__':
     # 서버를 5000 포트에서 실행
     app.run(port=5000,debug=True)
