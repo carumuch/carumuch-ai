@@ -149,7 +149,10 @@ def classify():
         
         json_file_name = most_similar_image.replace('.jpg', '.json')
         json_file_path = os.path.join(cost_file_path, json_file_name)
-        
+        print(json_file_path)
+        if '\\' in json_file_path:
+            json_file_path = json_file_path.replace("\\", "/")
+        print(json_file_path)
         with open(json_file_path, 'r', encoding='utf-8') as file:
             data = json.load(file)
         
