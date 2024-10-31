@@ -53,7 +53,7 @@ for label in labels:
 #헬스체크
 @app.route('/health-check', methods=['GET'])
 def healthCheck():
-    return 'Test Health Check'
+    return 'OK'
 
 
 @app.route('/segment',methods=['POST'])
