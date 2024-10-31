@@ -20,7 +20,7 @@ from flask_cors import CORS
 
 #Tensorflow 관련
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input
+from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input,decode_predictions
 from tensorflow.keras.models import Model
 import tensorflow as tf
 tf.config.set_visible_devices([], 'GPU') #GPU환경이 아닌 CPU환경에서 진행하기 위함
@@ -49,6 +49,34 @@ for label in labels:
 
     models.append(model)
 
+def is_car_image(url):
+    try:
+        # URL에서 이미지 다운로드
+        response = requests.get(url)
+        response.raise_for_status()  # 요청이 성공했는지 확인
+        img = Image.open(BytesIO(response.content))
+    except Exception as e:
+        raise ValueError(f"이미지를 가져오는 중 오류가 발생했습니다: {e}")
+    
+    # 이미지 전처리
+    img = img.resize((224, 224))  # VGG16의 입력 크기로 조정
+    img_array = np.array(img)
+    if img_array.shape[-1] == 4:  # 만약 이미지가 RGBA 포맷이라면 RGB로 변환
+        img_array = img_array[..., :3]
+    img_array = np.expand_dims(img_array, axis=0)
+    img_array = preprocess_input(img_array)
+    
+    # 예측 수행
+    predictions = base_model.predict(img_array)
+    decoded_predictions = decode_predictions(predictions, top=3)[0]
+    
+    # 자동차 관련 클래스 여부 확인
+    car_labels = ['car', 'minivan', 'sports_car', 'jeep', 'limousine', 'pickup', 'convertible']
+    for _, label, _ in decoded_predictions:
+        if any(car_label in label.lower() for car_label in car_labels):
+            return True
+    
+    return False
 
 #헬스체크
 @app.route('/health-check', methods=['GET'])
@@ -236,6 +264,11 @@ def classify():
     image_url = data.get('url')
     manufacturer = data.get('manufacturer')
     
+
+    # 사진이 자동차인지 확인하는 작업
+    if not is_car_image(image_url):
+        return jsonify({"error": "전달된 URL의 이미지는 자동차 사진이 아닙니다."}), 400
+
     if manufacturer == 'kia':
         img_features = process_image(image_url)
         pickle_filename = './kia_features_dict.pkl'
