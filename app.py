@@ -27,10 +27,14 @@ tf.config.set_visible_devices([], 'GPU') #GPU환경이 아닌 CPU환경에서 �
 from tensorflow.keras import backend as K
 import torch
 
-
+allowed_origins = [
+    "http://localhost:3000",
+    "https://carumuch-frontend.vercel.app/"
+]
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+#CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}}, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": allowed_origins}}, supports_credentials=True)
 # app 실행 시 VGG16 모델 로드 (지연 로드 방식 참고해볼것(추후))
 base_model = VGG16(weights='imagenet')
 v_model = Model(inputs=base_model.input, outputs=base_model.get_layer('fc1').output)
@@ -317,7 +321,10 @@ def classify():
 
 @app.after_request
 def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
+    origin = request.headers.get("Origin")
+    if origin in allowed_origins:
+        response.headers.add("Access-Control-Allow-Origin", origin)
+    #response.headers.add('Access-Control-Allow-Origin', 'http://localhost:3000')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
