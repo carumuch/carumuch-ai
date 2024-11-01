@@ -320,7 +320,7 @@ def after_request(response):
     if origin in allowed_origins:
         response.headers.add("Access-Control-Allow-Origin", origin)
     #response.headers.add('Access-Control-Allow-Origin', ['http://localhost:3000','https://carumuch-frontend.vercel.app'])
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,ngrok-skip-browser-warning')
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE')
     response.headers.add('Access-Control-Allow-Credentials', 'true')
     return response
