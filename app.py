@@ -316,7 +316,7 @@ def classify():
 @app.after_request
 def after_request(response):
     origin = request.headers.get("Origin")
-    allowed_origins = ["http://localhost:3000", "https://carumuch-frontend.vercel.app"]
+    allowed_origins = ["http://localhost:3000", "https://carumuch-frontend.vercel.app", "https://carumuch.shop"]
     if origin in allowed_origins:
         response.headers.add("Access-Control-Allow-Origin", origin)
     #response.headers.add('Access-Control-Allow-Origin', ['http://localhost:3000','https://carumuch-frontend.vercel.app'])
