@@ -17,6 +17,7 @@ import cv2
 import io
 import base64
 from flask_cors import CORS
+from src.repositories.estimate_repo import get_estimate_or_raise, EstimateNotFoundError
 
 #Tensorflow 관련
 from tensorflow.keras.preprocessing import image
@@ -240,8 +241,9 @@ def classify():
         with open(pickle_filename, 'rb') as f:
             loaded_df = pickle.load(f)
         most_similar_image, highest_similarity = npath_compare_images(img_features, loaded_df)
-        k_cost_file_path = './kia_견적서'
-        list_repair, total_cost = close_cost(k_cost_file_path, most_similar_image, manufacturer)
+        # k_cost_file_path = './kia_견적서'
+        # list_repair, total_cost = close_cost(k_cost_file_path, most_similar_image, manufacturer)
+        list_repair, total_cost = get_estimate_or_raise("kia", most_similar_image)
         del(loaded_df)
 
         # 세그멘테이션 처리
@@ -283,8 +285,9 @@ def classify():
             loaded_df = pickle.load(f)
         most_similar_image, highest_similarity = npath_compare_images(img_features, loaded_df)
         print(most_similar_image)
-        h_cost_file_path = './hyundai_견적서'
-        list_repair, total_cost = close_cost(h_cost_file_path, most_similar_image, manufacturer)
+        # h_cost_file_path = './hyundai_견적서'
+        # list_repair, total_cost = close_cost(h_cost_file_path, most_similar_image, manufacturer)
+        list_repair, total_cost = get_estimate_or_raise("hyundai", most_similar_image)
         del(loaded_df)
 
         # 세그멘테이션 부분 - 이미지를 처리 및 오버레이 적용
@@ -312,6 +315,14 @@ def classify():
             # 오류 발생 시 로그에 출력하고 오류 메시지 반환
             print(f"이미지 인코딩 오류: {e}")
             return jsonify({"error": "이미지 인코딩에 실패했습니다."}), 500
+
+@app.errorhandler(EstimateNotFoundError)
+def handle_estimate_not_found(e: EstimateNotFoundError):
+    # 원하신대로 500
+    return jsonify({
+        "error": "ESTIMATE_NOT_FOUND",
+        "message": f"estimate not found in DB: manufacturer={e.manufacturer}, image_name={e.image_name}",
+    }), 500
 
 @app.after_request
 def after_request(response):
