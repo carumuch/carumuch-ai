@@ -1,3 +1,12 @@
+---
+name: 이슈 템플릿 (임시)
+about: 이슈 제목
+title: ''
+labels: ''
+assignees: ''
+---
+
+
 ## 작업 내용
 
 - [ ] 구현내용1
