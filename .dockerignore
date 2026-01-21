@@ -1,0 +1,18 @@
+.git
+.vscode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+*.log
+
+# 원본 pkl은 이미지에 절대 포함시키지 않음
+*.pkl
+# 대신 gz는 포함
+!*.pkl.gz
+
+# (선택) 불필요한 폴더들 있으면 추가
+# scripts/

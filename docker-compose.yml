@@ -1,0 +1,12 @@
+services:
+  carumuch-ai:
+    build: .
+    container_name: carumuch-ai
+    ports:
+      - "5000:5000"
+    environment:
+      - ESTIMATE_DB_PATH=artifacts/estimate.db
+      - KIA_FEATURES_GZ=kia_features_dict.pkl.gz
+      - HYUNDAI_FEATURES_GZ=h_features_dict.pkl.gz
+      - TF_CPP_MIN_LOG_LEVEL=2
+    restart: unless-stopped

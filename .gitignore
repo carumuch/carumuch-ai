@@ -268,6 +268,7 @@ $RECYCLE.BIN/
 
 #extra files
 *.pkl
+*.pkl.gz
 h_features_dict.pkl
 kia_견적서/
 hyundai_견적서/
