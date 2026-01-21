@@ -18,6 +18,7 @@ import io
 import base64
 from flask_cors import CORS
 from src.repositories.estimate_repo import get_estimate_or_raise, EstimateNotFoundError
+from src.services.load_gz_pickle import get_features_dict
 
 #Tensorflow 관련
 from tensorflow.keras.preprocessing import image
@@ -318,7 +319,6 @@ def classify():
 
 @app.errorhandler(EstimateNotFoundError)
 def handle_estimate_not_found(e: EstimateNotFoundError):
-    # 원하신대로 500
     return jsonify({
         "error": "ESTIMATE_NOT_FOUND",
         "message": f"estimate not found in DB: manufacturer={e.manufacturer}, image_name={e.image_name}",
